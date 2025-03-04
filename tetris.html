@@ -43,6 +43,7 @@
     let field = [];
 
     //フィールドのクリア
+    // これ多分いらない
     for(let y=0; y<FIELD_ROW ; y++ )
     {
         field[y] = [];
@@ -86,48 +87,120 @@
     }
     
     //全部描画する
-function drawAll()
-{
-	con.clearRect(0,0,SCREEN_W,SCREEN_H);
-	
-	for(let y=0; y<FIELD_ROW ; y++ )
-	{
-		for(let x=0; x<FIELD_COL ; x++ )
-		{
-			if( field[y][x] )
-			{
-				drawBlock(x,y);
-			}
-		}
-	}
-	for(let y=0; y<TETRO_SIZE ; y++ )
-	{
-		for(let x=0; x<TETRO_SIZE ; x++ )
-		{
-			if( tetro[y][x] )
-			{
-				drawBlock(tetro_x+x, tetro_y+y);
-			}
-		}
-	}
-}
+    function drawAll()
+    {
+        con.clearRect(0,0,SCREEN_W,SCREEN_H);
+        
+        for(let y=0; y<FIELD_ROW ; y++ )
+        {
+            for(let x=0; x<FIELD_COL ; x++ )
+            {
+                if( field[y][x] )
+                {
+                    drawBlock(x,y);
+                }
+            }
+        }
+        for(let y=0; y<TETRO_SIZE ; y++ )
+        {
+            for(let x=0; x<TETRO_SIZE ; x++ )
+            {
+                if( tetro[y][x] )
+                {
+                    drawBlock(tetro_x+x, tetro_y+y);
+                }
+            }
+        }
+    }
+
+    function checkMove(mx,my,ntetro){
+
+        if(ntetro == undefined)ntetro = tetro;
+        for(let y=0; y<TETRO_SIZE; y++ )
+        {
+            for(let x=0; x<TETRO_SIZE; x++ )
+            {
+                let nx = tetro_x + mx + x;
+                let ny = tetro_y + my + y;
+                if(ntetro[y][x] ){
+                    if(ny<0 ||
+                    nx<0 ||
+                    ny>= FIELD_ROW ||
+                    nx>= FIELD_COL ||
+                    field[ny][nx]){
+                    return false;
+                    }
+
+                        
+                }
+            }
+        }
+        return true;
+    }
+
+    //てとろの回転  
+    function rotate(){
+        let ntetro = [];
+
+        for(let y=0;y<TETRO_SIZE; y++){
+
+            ntetro[y]=[];
+            for(let x=0;x<TETRO_SIZE;x++){
+                ntetro[y][x] = tetro [TETRO_SIZE-x-1][y];
+                //元の位置 (0, 0) の要素は、回転後に (4-1-0,0) = (0, 3) に移動します。
+                //元の位置 (2,1) の要素は、回転後に (4-1-1,2) = (2, 2) に移動します。
+                /*  0 1 2 3 x
+                0.
+                1
+                2
+                3
+                
+                y
+
+                ↓
+
+                    0 1 2 3 x
+                0       .
+                1         
+                2         
+                3         
+                y
+                */
+           }
+        }
+
+        return ntetro;
+    }
     
     document.onkeydown = function(e) { // ボタン押された時にfunction呼び出し
         switch (e.keyCode) { // keyCodeは数字。onkeydown keycodeで検索
             case 39: // 右
-                tetro_x++;
+                if(checkMove(1,0)){
+                    tetro_x++;
+                }
+                
                 break;
             case 37: // 左
-                tetro_x--;
+                if(checkMove(-1,0)){
+                    tetro_x--;
+                }
+                
                 break;
             case 38: // 上
-                tetro_y--;
+                if(checkMove(0,-1)){
+                    tetro_y--;
+                }
+                
                 break;
             case 40: // 下
-                tetro_y++;
+                if(checkMove(0,1)){
+                    tetro_y++;
+                }
+                
                 break;
             case 32: // スペース
-                // スペースキーの動作をここに記述
+                let ntetro =rotate();//functionの外なのでntetroを宣言しなおして1コ下の行で使う
+                if(checkMove(0,0,ntetro))tetro = ntetro;
                 break;
         }
         drawAll();
