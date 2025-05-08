@@ -4,6 +4,8 @@
 <body>
     <canvas id="can"></canvas>
 <script>
+    //落ちるスピード
+    const GAME_SPEED = 500;
     //フィールドサイズ(マス数)
     const FIELD_COL = 10;
     const FIELD_ROW = 20;
@@ -15,17 +17,63 @@
     const SCREEN_W = BLOCK_SIZE * FIELD_COL; // 30 * 10
     const SCREEN_H = BLOCK_SIZE * FIELD_ROW; // 30 * 20
 
+    const TETRO_TYPES = [
+	[],	// 0.空っぽ
+	
+	[					// 1.I
+		[ 0, 0, 0, 0 ],
+		[ 1, 1, 1, 1 ],
+		[ 0, 0, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	[					// 2.L
+		[ 0, 1, 0, 0 ],
+		[ 0, 1, 0, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	[					// 3.J
+		[ 0, 0, 1, 0 ],
+		[ 0, 0, 1, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	[					// 4.T
+		[ 0, 1, 0, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 0, 1, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	[					// 5.O
+		[ 0, 0, 0, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	[					// 6.Z
+		[ 0, 0, 0, 0 ],
+		[ 1, 1, 0, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 0, 0, 0, 0 ]
+	],
+	[					// 7.S
+		[ 0, 0, 0, 0 ],
+		[ 0, 1, 1, 0 ],
+		[ 1, 1, 0, 0 ],
+		[ 0, 0, 0, 0 ]
+	]
+];
+    
     //てとろみの本体
-    let tetro = [
-        [0, 0, 0, 0],
-        [1, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0]
-    ];
+    let tetro;
+    //テトロミノの形
+    let tetro_t;
 
     //てとろみの座標
     let tetro_x = 0;
-    let tetro_y = 0;
+    let tetro_y = 0
+    tetro_t = Math.floor( Math.random()*(TETRO_TYPES.length-1) )+1;
+    tetro = TETRO_TYPES[tetro_t]
 
     //てとろみのサイズ
     const TETRO_SIZE = 4;
@@ -41,6 +89,8 @@
     
     //フィールド本体
     let field = [];
+
+    setInterval(dropTetro, GAME_SPEED);
 
     //フィールドのクリア
     // これ多分いらない
@@ -66,10 +116,7 @@
                 field[y][x] =0;
             }
         }
-        
-        field[5][8]  = 1;
-        field[19][9] = 1;
-        field[19][0] = 1;
+    
     }
     init();
     drawAll();//場所が重要。なんか必ず2つセット
@@ -171,6 +218,31 @@
 
         return ntetro;
     }
+    function fixTetro(){
+        for(let y=0;y<TETRO_SIZE; y++)
+        {
+            for(let x=0;x<TETRO_SIZE;x++){
+                if(tetro[y][x]){
+                    field[tetro_y + y][tetro_x + x] = 1;
+                }
+            
+            }
+        }
+
+    }
+
+    function dropTetro(){
+        if(checkMove(0,1)){
+                    tetro_y++;
+                }
+        else{
+            fixTetro();
+            tetro_x = 0;
+            tetro_y = 0;
+        }
+        drawAll();
+    }
+    
     
     document.onkeydown = function(e) { // ボタン押された時にfunction呼び出し
         switch (e.keyCode) { // keyCodeは数字。onkeydown keycodeで検索
