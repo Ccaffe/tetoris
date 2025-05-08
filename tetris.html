@@ -17,6 +17,16 @@
     const SCREEN_W = BLOCK_SIZE * FIELD_COL; // 30 * 10
     const SCREEN_H = BLOCK_SIZE * FIELD_ROW; // 30 * 20
 
+    const TETRO_COLORS = [
+        "#000",			//0空
+        "#6CF",			//1水色
+        "#F92",			//2オレンジ
+        "#66F",			//3青
+        "#C5C",			//4紫
+        "#FD2",			//5黄色
+        "#F44",			//6赤
+        "#5B5"			//7緑
+    ];
     const TETRO_TYPES = [
 	[],	// 0.空っぽ
 	
@@ -69,9 +79,6 @@
     //テトロミノの形
     let tetro_t;
 
-    //てとろみの座標
-    let tetro_x = 0;
-    let tetro_y = 0
     tetro_t = Math.floor( Math.random()*(TETRO_TYPES.length-1) )+1;
     tetro = TETRO_TYPES[tetro_t]
 
@@ -80,6 +87,14 @@
     let can = document.getElementById("can");
     let con = can.getContext("2d");
     can.style.border = "4px dashed red";
+
+    //初期位置
+    const START_X = FIELD_COL/2 - TETRO_SIZE/2;
+    const START_Y = 0;
+    //てとろみの座標
+    let tetro_x = START_X;
+    let tetro_y = START_Y;
+
 
     //300 * 600のスクリーンを実行
     can.width = SCREEN_W;
@@ -123,11 +138,11 @@
 
    
 
-    function drawBlock(x,y){
+    function drawBlock(x,y,c){
         let px = x * BLOCK_SIZE;
         let py = y * BLOCK_SIZE;
 
-        con.fillStyle = "red";
+        con.fillStyle = TETRO_COLORS[c];
         con.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
         con.strokeStyle = "black";
         con.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
@@ -144,7 +159,7 @@
             {
                 if( field[y][x] )
                 {
-                    drawBlock(x,y);
+                    drawBlock(x,y,field[y][x]);
                 }
             }
         }
@@ -154,7 +169,7 @@
             {
                 if( tetro[y][x] )
                 {
-                    drawBlock(tetro_x+x, tetro_y+y);
+                    drawBlock(tetro_x+x, tetro_y+y,tetro_t);
                 }
             }
         }
@@ -223,7 +238,7 @@
         {
             for(let x=0;x<TETRO_SIZE;x++){
                 if(tetro[y][x]){
-                    field[tetro_y + y][tetro_x + x] = 1;
+                    field[tetro_y + y][tetro_x + x] = tetro_t;
                 }
             
             }
@@ -237,6 +252,9 @@
                 }
         else{
             fixTetro();
+
+            tetro_t = Math.floor( Math.random()*(TETRO_TYPES.length-1) )+1;
+            tetro = TETRO_TYPES[tetro_t]
             tetro_x = 0;
             tetro_y = 0;
         }
@@ -278,7 +296,6 @@
         drawAll();
            
     } 
-    
 
 
 </script>
